@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music_switcher/apple/apple_api.dart';
 import 'package:music_switcher/apple/apple_authentication.dart';
 import 'package:music_switcher/spotify/spotify_api.dart';
+import 'package:music_switcher/url_parser.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,22 +61,17 @@ class _MyHomePageState extends State<MyHomePage> {
     AppleAuthentication.generateJwt();
   }
 
-  searchApple() async {
-    await AppleApi().searchApple(textFieldController.text).then(
-        (result) => print(result.results.songs.data.first.attributes.url));
-  }
-
-  //Search Spotify for a song that matches a certain query
-  searchSpotify() async {
-    await SpotifyApi()
-        .spotifySearch(textFieldController.text)
-        .then((result) => print(result.tracks.items.first.externalUrls.url));
+  // Send whatever is in the clipboard to the URL Parser for conversion.
+  convertUrl() async {
+    String convertedUrl = await UrlParser.parseUrl(textFieldController.text);
+    setState(() {
+      textFieldController.text = convertedUrl;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
+    // This method is rerun every time setState is called.
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -103,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: searchApple,
+        onPressed: convertUrl,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:music_switcher/spotify/spotify_authentication_model.dart';
 import 'package:music_switcher/spotify/spotify_search_result_model.dart';
+import 'package:music_switcher/spotify/spotify_song_result_model.dart';
 
 class SpotifyApi {
   // Yes, this is insecure. Stores the authentication token returned from Spotify.
@@ -28,18 +29,38 @@ class SpotifyApi {
     }
   }
 
-  Future<SpotifySearch> spotifySearch(String searchQuery) async {
+  Future<String> search(String searchQuery) async {
     String formattedQuery = searchQuery.replaceAll(' ', '+');
     Uri requestUrl = Uri.parse(
         "https://api.spotify.com/v1/search?q=$formattedQuery&type=track&market=US&limit=1");
-    print(requestUrl.toString());
     var headers = {HttpHeaders.authorizationHeader: "Bearer $authToken"};
     final response = await http.get(requestUrl, headers: headers);
+
     if (response.statusCode == 200) {
       return SpotifySearch.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+              jsonDecode(response.body) as Map<String, dynamic>)
+          .tracks
+          .items
+          .first
+          .externalUrls
+          .url;
     } else {
       throw Exception('Error while fetching Spotify search result');
+    }
+  }
+
+  Future<String> fetchSongById(String id) async {
+    Uri requestUrl =
+        Uri.parse("https://api.spotify.com/v1/tracks/$id?market=US");
+    var headers = {HttpHeaders.authorizationHeader: "Bearer $authToken"};
+    final response = await http.get(requestUrl, headers: headers);
+
+    if (response.statusCode == 200) {
+      return SpotifySongResult.fromJson(
+              jsonDecode(response.body) as Map<String, dynamic>)
+          .name;
+    } else {
+      throw Exception("Failed to fetch Spotify song by Id");
     }
   }
 }

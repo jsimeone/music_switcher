@@ -25,6 +25,5 @@ CvvmLKnL
       'exp': (DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600
     });
     token = jwt.sign(ECPrivateKey(secretKey), algorithm: JWTAlgorithm.ES256);
-    print(token);
   }
 }
