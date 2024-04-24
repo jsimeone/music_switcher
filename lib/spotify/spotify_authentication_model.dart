@@ -3,11 +3,13 @@ class SpotifyAuthentication {
   final String tokenType;
   final int expiresIn;
 
+  // Constructor for this class with required arguments
   const SpotifyAuthentication(
       {required this.accessToken,
       required this.tokenType,
       required this.expiresIn});
 
+  /// Manually generate an instance of SpotifyAuthentication based on JSON.
   factory SpotifyAuthentication.fromJson(Map<String, dynamic> json) {
     return switch (json) {
       {

@@ -6,29 +6,21 @@ import 'package:music_switcher/apple/apple_search_model.dart';
 import 'package:music_switcher/apple/apple_song_result_model.dart';
 
 class AppleApi {
-  // Future<void> appleTest() async {
-  //   String token = AppleAuthentication.token;
-  //   Uri requestUrl = Uri.parse("https://api.music.apple.com/v1/test");
-  //   var headers = {HttpHeaders.authorizationHeader: "Bearer $token"};
-  //   final response = await http.get(requestUrl, headers: headers);
+  // Authentication headers to be passed with each request. Uses the token calculated in the AppleAuthentication class.
+  final authorizationHeader = {
+    HttpHeaders.authorizationHeader: "Bearer ${AppleAuthentication.token}"
+  };
 
-  //   if (response.statusCode == 200) {
-  //     print(response.body);
-  //   } else {
-  //     print(response.statusCode);
-  //     throw Exception("Error while fetching Apple Music");
-  //   }
-  // }
-
+  /// Takes a String of words to search for and returns the Apple Music URL of the first result.
   Future<String> search(String searchQuery) async {
-    String token = AppleAuthentication.token;
-    String formattedQuery = searchQuery.replaceAll(' ', '+');
+    String formattedQuery = searchQuery.replaceAll(' ',
+        '+'); // Replace all spaces in the query with '+' to fit the URL scheme.
     Uri requestUrl = Uri.parse(
         "https://api.music.apple.com/v1/catalog/us/search?types=songs&limit=1&term=$formattedQuery");
-    var headers = {HttpHeaders.authorizationHeader: "Bearer $token"};
-    final response = await http.get(requestUrl, headers: headers);
+    final response = await http.get(requestUrl, headers: authorizationHeader);
 
     if (response.statusCode == 200) {
+      // Check whether Apple reported the request successful
       return AppleSearch.fromJson(
               jsonDecode(response.body) as Map<String, dynamic>)
           .results
@@ -42,14 +34,14 @@ class AppleApi {
     }
   }
 
+  /// Returns a song's name by its ID stripped out of a share link.
   Future<String> fetchSongById(String id) async {
-    String token = AppleAuthentication.token;
     Uri requestUrl =
         Uri.parse("https://api.music.apple.com/v1/catalog/us/songs/$id");
-    var headers = {HttpHeaders.authorizationHeader: "Bearer $token"};
-    final response = await http.get(requestUrl, headers: headers);
+    final response = await http.get(requestUrl, headers: authorizationHeader);
 
     if (response.statusCode == 200) {
+      // Check whether apple reported the request successful
       return AppleSongResult.fromJson(
               jsonDecode(response.body) as Map<String, dynamic>)
           .data

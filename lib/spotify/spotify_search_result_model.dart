@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'spotify_search_result_model.g.dart';
 
+// NOTE: See apple_search_model.dart for an explanation of these classes.
 @JsonSerializable()
 class SpotifyUrl {
   SpotifyUrl(this.url);

@@ -1,5 +1,10 @@
+/*
+Joseph Simeone
+# CITE: J. Sande, Dart Apprentice: Fundamentals: Modern Cross-Platform Programming with Dart, 1st ed. Kodeco, 2022. 
+*/
+
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:music_switcher/apple/apple_api.dart';
 import 'package:music_switcher/apple/apple_authentication.dart';
 import 'package:music_switcher/spotify/spotify_api.dart';
 import 'package:music_switcher/url_parser.dart';
@@ -15,12 +20,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Music Swapper',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green.shade400),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Music Swap'),
+      home: const MyHomePage(title: 'Music Swapper'),
     );
   }
 }
@@ -28,27 +33,23 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  final String title;
+  final String title; // The title to be displayed at the top of the home page.
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final textFieldController = TextEditingController();
+  bool loading = false; // Whether or not the app is processing a URL.
 
   // Called once upon app startup. Do all logging into third party stuff here
   @override
   void initState() {
     super.initState();
+
+    // Get credentials for both APIs on app launch
     callSpotifyLoginApi();
     generateAppleToken();
-  }
-
-  @override
-  void dispose() {
-    textFieldController.dispose();
-    super.dispose();
   }
 
   // Get an authentication token from Spotify on app startup.
@@ -63,9 +64,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Send whatever is in the clipboard to the URL Parser for conversion.
   convertUrl() async {
-    String convertedUrl = await UrlParser.parseUrl(textFieldController.text);
+    // Set the loading variable and force a UI update.
     setState(() {
-      textFieldController.text = convertedUrl;
+      loading = true;
+    });
+
+    String urlToConvert = await FlutterClipboard.paste();
+    String convertedUrl = await UrlParser.parseUrl(urlToConvert);
+    await FlutterClipboard.copy(convertedUrl);
+
+    // Reset the loading variable and force UI update to dismiss loading spinner
+    setState(() {
+      loading = false;
     });
   }
 
@@ -83,25 +93,21 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: const Text(
-              'Enter a song\'s name to generate a Spotify link.',
+              'Copy a link from either Spotify or Apple Music to your clipboard, and click the button below!',
+              textAlign: TextAlign.center,
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-            child: TextFormField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Song name',
-              ),
-              controller: textFieldController,
-            ),
+            // Show either a loading spinner or the convert button depending on the loading variable.
+            child: loading
+                ? CircularProgressIndicator()
+                : FilledButton(
+                    onPressed: convertUrl,
+                    child: Text('Convert!'),
+                  ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: convertUrl,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

@@ -1,16 +1,11 @@
-# music_switcher
+# Music Swapper!
 
-A new Flutter project.
+A fun little app that lets you share songs between the two most popular music streaming platforms: Apple Music and Spotify. Just copy a link to one song and click one button to convert it.
 
-## Getting Started
+## [Video Demonstration](https://drive.google.com/file/d/15lQYKf70ZCj76XTTKIRnkEZ-n_tRwyLp/view?usp=sharing)
 
-This project is a starting point for a Flutter application.
+## Notes for Graders
+ - All my code is located in `/lib`
+ - Please don't judge the way I store things like private keys. I'm so aware that it's terrible and I would never do it in production.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation Instructions (if you really want to do that)
